@@ -1,5 +1,5 @@
 {
-  "name": "klikket",
+  "name": "gladnytt",
   "scripts": {
     "build": "pnpm tailwindcss -i ./tailwind.css -o ./static/output.css --minify",
     "format": "prettier --write ."
