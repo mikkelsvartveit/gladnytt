@@ -2,15 +2,23 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"text/template"
 	"time"
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/joho/godotenv"
 )
 
 func main() {
+	// Load the .env file
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+
 	r := chi.NewRouter()
 
 	r.Use(middleware.Logger)

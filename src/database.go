@@ -103,6 +103,7 @@ func listArticles(page int, limit int) []Article {
 	err := db.Select(&articleRows, `
 		SELECT id, title, description, articleUrl, imageUrl, timestamp, sentiment
 		FROM articles
+		WHERE sentiment != 'negative'
 		ORDER BY timestamp DESC
 		LIMIT ? OFFSET ?
 	`, limit, (page-1)*limit)

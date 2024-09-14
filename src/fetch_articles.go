@@ -61,7 +61,7 @@ func fetchData() {
 	}
 
 	// Only fetch the first N items
-	rss.Channel.Items = rss.Channel.Items[:3]
+	rss.Channel.Items = rss.Channel.Items[:20]
 
 	for _, item := range rss.Channel.Items {
 		processArticle(item)
@@ -89,8 +89,7 @@ func processArticle(rssItem Item) {
 		ImageUrl:    rssItem.MediaContent.URL,
 	}
 
-	// TODO: Run article through LLM filter to get isShown
-	article.Sentiment = "neutral"
+	article.Sentiment = getSentiment(article.Title + "\n\n" + article.Description)
 
 	insertArticle(article)
 }
