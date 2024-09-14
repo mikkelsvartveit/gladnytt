@@ -15,7 +15,7 @@ RUN CGO_ENABLED=1 go build -v -o ./main ./src
 # Production stage
 FROM alpine:latest
 
-RUN apk --no-cache add ca-certificates
+RUN apk --no-cache add ca-certificates tzdata
 
 COPY --from=builder /app/main /main
 COPY --from=builder /app/templates /templates

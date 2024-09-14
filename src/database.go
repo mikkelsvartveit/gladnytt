@@ -113,6 +113,11 @@ func listArticles(page int, limit int) []Article {
 		return nil
 	}
 
+	norwayTimezone, err := time.LoadLocation("Europe/Oslo")
+	if err != nil {
+		fmt.Println("Error loading timezone:", err)
+	}
+
 	var articles []Article
 	for _, row := range articleRows {
 		article := Article{
@@ -120,7 +125,7 @@ func listArticles(page int, limit int) []Article {
 			Description: row.Description,
 			ArticleUrl:  row.ArticleUrl,
 			ImageUrl:    row.ImageUrl,
-			Time:        time.Unix(row.Timestamp, 0),
+			Time:        time.Unix(row.Timestamp, 0).In(norwayTimezone),
 			Sentiment:   row.Sentiment,
 		}
 
