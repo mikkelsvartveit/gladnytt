@@ -3,6 +3,8 @@
     <title>Filtrert.no – den trivelige nyhetssiden</title>
     <link rel="stylesheet" href="/output.css" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <script src="/htmx.min.js"></script>
   </head>
 
   <body>
@@ -12,31 +14,47 @@
       </h1>
 
       <div>
-        {{ range . }}
-          <div>
-            <div class="my-8 h-px bg-gray-200"></div>
+        {{ block "articles" . }}
+          {{ range .Articles }}
+            <div>
+              <div class="my-8 h-px bg-gray-200"></div>
 
-            <a href="{{ .ArticleUrl }}" class="flex flex-col gap-4 sm:flex-row">
-              <img
-                class="aspect-video rounded sm:h-36"
-                src="{{ .ImageUrl }}"
-                alt="{{ .Title }}"
-                onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'100\' height=\'100\'%3E%3Crect width=\'100\' height=\'100\' fill=\'%23f3f4f6\'/%3E%3C/svg%3E';"
-              />
-              <div class="flex-1">
-                <p class="text-xs font-medium text-gray-600">
-                  {{ .Time.Format "Monday, 15:04" }}
-                </p>
-                <h3 class="mb-2 mt-1 text-xl">
-                  {{ .Title }}
-                </h3>
+              <a
+                href="{{ .ArticleUrl }}"
+                class="flex flex-col gap-4 sm:flex-row"
+              >
+                <img
+                  class="aspect-video rounded sm:h-36"
+                  src="{{ .ImageUrl }}"
+                  alt="{{ .Title }}"
+                  onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'100\' height=\'100\'%3E%3Crect width=\'100\' height=\'100\' fill=\'%23f3f4f6\'/%3E%3C/svg%3E';"
+                />
 
-                <p class="line-clamp-3 text-sm">
-                  {{ .Description }}
-                </p>
-              </div>
-            </a>
-          </div>
+                <div class="flex-1">
+                  <p class="text-xs font-medium text-gray-600">
+                    {{ .Time.Format "Monday, 15:04" }}
+                  </p>
+                  <h3 class="mb-2 mt-1 text-xl">
+                    {{ .Title }}
+                  </h3>
+
+                  <p class="line-clamp-3 text-sm">
+                    {{ .Description }}
+                  </p>
+                </div>
+              </a>
+            </div>
+          {{ end }}
+
+
+          <img
+            hx-get="/articles/{{ .NextPage }}"
+            hx-trigger="revealed"
+            hx-swap="outerHTML"
+            src="/loading.svg"
+            alt="Loading..."
+            class="mx-auto mt-8 h-10"
+          />
         {{ end }}
       </div>
     </main>

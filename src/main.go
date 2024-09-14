@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 	"text/template"
 	"time"
 
@@ -10,6 +11,11 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/joho/godotenv"
 )
+
+type PageData struct {
+	NextPage int
+	Articles []Article
+}
 
 func main() {
 	// Load the .env file
@@ -30,11 +36,47 @@ func main() {
 	// Run Goroutine to fetch data periodically
 	go runPeriodically(time.Minute*5, fetchData)
 
-	// Serve index.html
+	// Load HTML template
 	indexTmpl := template.Must(template.ParseFiles("templates/index.html"))
+
+	// Serve front page
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		articles := listArticles(1, 10)
-		err := indexTmpl.Execute(w, articles)
+		page := 1
+
+		pageData := PageData{
+			NextPage: page + 1,
+			Articles: articles,
+		}
+
+		err := indexTmpl.Execute(w, pageData)
+		if err != nil {
+			fmt.Println("Error executing template:", err)
+		}
+	})
+
+	// Serve articles fragment for htmx lazy loading
+	r.Get("/articles/{page}", func(w http.ResponseWriter, r *http.Request) {
+		page, err := strconv.Atoi(chi.URLParam(r, "page"))
+		if err != nil {
+			fmt.Println("Error parsing page number:", err)
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+
+		articles := listArticles(page, 10)
+
+		if len(articles) == 0 {
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+
+		pageData := PageData{
+			NextPage: page + 1,
+			Articles: articles,
+		}
+
+		err = indexTmpl.ExecuteTemplate(w, "articles", pageData)
 		if err != nil {
 			fmt.Println("Error executing template:", err)
 		}

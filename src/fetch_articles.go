@@ -61,7 +61,7 @@ func fetchData() {
 	}
 
 	// Only fetch the first N items
-	rss.Channel.Items = rss.Channel.Items[:20]
+	rss.Channel.Items = rss.Channel.Items[:30]
 
 	for _, item := range rss.Channel.Items {
 		processArticle(item)
