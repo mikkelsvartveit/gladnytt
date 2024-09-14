@@ -60,9 +60,9 @@ func fetchData() {
 	}
 
 	// Only fetch the first N items
-	rss.Channel.Items = rss.Channel.Items[:3]
+	// rss.Channel.Items = rss.Channel.Items[:10]
 
 	for _, item := range rss.Channel.Items {
-		addArticleIfNotExists(item.Link, item.MediaContent.URL, item.PubDate)
+		addArticleIfNotExists(item.Title, item.Description, item.Link, item.MediaContent.URL, item.PubDate)
 	}
 }

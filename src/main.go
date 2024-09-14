@@ -16,15 +16,6 @@ func main() {
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 
-	// Serve index.html
-	indexTmpl := template.Must(template.ParseFiles("templates/index.html"))
-	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		indexTmpl.Execute(w, nil)
-	})
-
-	// Serve all files from the "static" directory
-	r.Handle("/*", http.StripPrefix("/", http.FileServer(http.Dir("static"))))
-
 	// Initialize database
 	dbErr := initializeDatabase()
 	if dbErr != nil {
@@ -34,6 +25,19 @@ func main() {
 
 	// Run Goroutine to fetch data periodically
 	go runPeriodically(time.Minute*5, fetchData)
+
+	// Serve index.html
+	indexTmpl := template.Must(template.ParseFiles("templates/index.html"))
+	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
+		articles := getArticles(1, 10)
+		err := indexTmpl.Execute(w, articles)
+		if err != nil {
+			fmt.Println("Error executing template:", err)
+		}
+	})
+
+	// Serve all files from the "static" directory
+	r.Handle("/*", http.StripPrefix("/", http.FileServer(http.Dir("static"))))
 
 	httpErr := http.ListenAndServe(":8080", r)
 	if httpErr != nil {
