@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"time"
 )
 
 type RSS struct {
@@ -60,9 +61,36 @@ func fetchData() {
 	}
 
 	// Only fetch the first N items
-	// rss.Channel.Items = rss.Channel.Items[:10]
+	rss.Channel.Items = rss.Channel.Items[:3]
 
 	for _, item := range rss.Channel.Items {
-		addArticleIfNotExists(item.Title, item.Description, item.Link, item.MediaContent.URL, item.PubDate)
+		processArticle(item)
 	}
+}
+
+func processArticle(rssItem Item) {
+	// Check if article already exists in database
+	if articleExists(rssItem.Link) {
+		return
+	}
+
+	// Convert pubDate to Unix timestamp
+	time, err := time.Parse(time.RFC1123, rssItem.PubDate)
+	if err != nil {
+		fmt.Println("Error parsing pubDate:", err)
+		return
+	}
+
+	article := Article{
+		Title:       rssItem.Title,
+		Description: rssItem.Description,
+		Time:        time,
+		ArticleUrl:  rssItem.Link,
+		ImageUrl:    rssItem.MediaContent.URL,
+	}
+
+	// TODO: Run article through LLM filter to get isShown
+	article.Sentiment = "neutral"
+
+	insertArticle(article)
 }

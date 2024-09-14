@@ -29,7 +29,7 @@ func main() {
 	// Serve index.html
 	indexTmpl := template.Must(template.ParseFiles("templates/index.html"))
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		articles := getArticles(1, 10)
+		articles := listArticles(1, 10)
 		err := indexTmpl.Execute(w, articles)
 		if err != nil {
 			fmt.Println("Error executing template:", err)

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"database/sql"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -11,22 +10,23 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-type ArticleTable struct {
-	ID          int          `db:"id"`
-	Title       string       `db:"title"`
-	Description string       `db:"description"`
-	ArticleUrl  string       `db:"articleUrl"`
-	ImageUrl    string       `db:"imageUrl"`
-	IsShown     sql.NullBool `db:"isShown"`
-	Datetime    int64        `db:"datetime"`
+type ArticleModel struct {
+	ID          int    `db:"id"`
+	Title       string `db:"title"`
+	Description string `db:"description"`
+	Timestamp   int64  `db:"timestamp"`
+	ArticleUrl  string `db:"articleUrl"`
+	ImageUrl    string `db:"imageUrl"`
+	Sentiment   string `db:"sentiment"`
 }
 
 type Article struct {
 	Title       string
 	Description string
+	Time        time.Time
 	ArticleUrl  string
 	ImageUrl    string
-	Time        time.Time
+	Sentiment   string
 }
 
 var db *sqlx.DB
@@ -62,59 +62,48 @@ func initializeDatabase() error {
 func createTablesIfNotExist() error {
 	_, err := db.Exec(`
 		CREATE TABLE IF NOT EXISTS articles (
-			id INTEGER PRIMARY KEY AUTOINCREMENT,
-			title TEXT NOT NULL,
-			description TEXT NOT NULL,
-			articleUrl TEXT UNIQUE NOT NULL,
-			imageUrl TEXT NOT NULL,
-			datetime INTEGER NOT NULL,
-			isShown BOOLEAN
+			id INTEGER PRIMARY KEY,
+			title TEXT,
+			description TEXT,
+			timestamp INTEGER,
+			articleUrl TEXT,
+			imageUrl TEXT,
+			sentiment TEXT
 		);
 	`)
 
 	return err
 }
 
-func addArticleIfNotExists(title string, description string, articleUrl string, imageUrl string, pubDate string) {
-	// Check if article already exists in database
+func articleExists(articleUrl string) bool {
 	var articleId int
+
 	err := db.Get(&articleId, `
 		SELECT id FROM articles
 		WHERE articleUrl = ?
 	`, articleUrl)
 
-	if err == nil {
-		// Article already exists, skip
-		return
-	}
+	return err == nil
+}
 
-	// Convert pubDate to Unix timestamp
-	time, err := time.Parse(time.RFC1123, pubDate)
-	if err != nil {
-		fmt.Println("Error parsing pubDate:", err)
-		return
-	}
-	datetime := time.Unix()
-
-	// TODO: Run article through LLM filter to get isShown
-
+func insertArticle(article Article) {
 	_, dbInsertErr := db.Exec(`
-		INSERT INTO articles (title, description, articleUrl, imageUrl, datetime)
-		VALUES (?, ?, ?, ?, ?)
-	`, title, description, articleUrl, imageUrl, datetime)
+		INSERT INTO articles (title, description, articleUrl, imageUrl, timestamp, sentiment)
+		VALUES (?, ?, ?, ?, ?, ?)
+	`, article.Title, article.Description, article.ArticleUrl, article.ImageUrl, article.Time.Unix(), article.Sentiment)
 
 	if dbInsertErr != nil {
 		fmt.Println("Error adding article:", dbInsertErr)
 	}
 }
 
-func getArticles(page int, limit int) []Article {
-	var rawArticles []ArticleTable
+func listArticles(page int, limit int) []Article {
+	var articleRows []ArticleModel
 
-	err := db.Select(&rawArticles, `
-		SELECT id, title, description, articleUrl, imageUrl, datetime, isShown
+	err := db.Select(&articleRows, `
+		SELECT id, title, description, articleUrl, imageUrl, timestamp, sentiment
 		FROM articles
-		ORDER BY datetime DESC
+		ORDER BY timestamp DESC
 		LIMIT ? OFFSET ?
 	`, limit, (page-1)*limit)
 
@@ -124,17 +113,17 @@ func getArticles(page int, limit int) []Article {
 	}
 
 	var articles []Article
-	for _, rawArticle := range rawArticles {
+	for _, row := range articleRows {
 		article := Article{
-			Title:       rawArticle.Title,
-			Description: rawArticle.Description,
-			ArticleUrl:  rawArticle.ArticleUrl,
-			ImageUrl:    rawArticle.ImageUrl,
-			Time:        time.Unix(rawArticle.Datetime, 0),
+			Title:       row.Title,
+			Description: row.Description,
+			ArticleUrl:  row.ArticleUrl,
+			ImageUrl:    row.ImageUrl,
+			Time:        time.Unix(row.Timestamp, 0),
+			Sentiment:   row.Sentiment,
 		}
 
 		articles = append(articles, article)
-
 	}
 
 	return articles
