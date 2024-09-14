@@ -4,10 +4,10 @@ tmp_dir = "tmp"
 
 [build]
   pre_cmd = ["pnpm --silent build"]
-  cmd = "go build -o ./tmp/main ."
+  cmd = "go build -o ./tmp/main ./src"
   bin = "./tmp/main"
   args_bin = []
-  delay = 0
+  delay = 100
   exclude_dir = ["static", "assets", "tmp", "node_modules"]
   exclude_file = []
   exclude_regex = ["_test.go"]
