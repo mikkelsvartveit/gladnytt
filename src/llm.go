@@ -38,7 +38,7 @@ func callLLM(system_prompt, user_prompt string) string {
 }
 
 func getSentiment(text string) string {
-	system_prompt := "You will be presented with text from a news article. You need to determine the sentiment of the text. The sentiment should be one of the following: 'positive', 'neutral', 'negative'. If you are unsure, return neutral. Do not return anything else."
+	system_prompt := "You will be presented with text from a news article. You need to determine the sentiment of the text. The sentiment should be one of the following: 'positive', 'neutral', 'negative'. Do not respond with anything else."
 
 	sentiment := callLLM(system_prompt, text)
 
