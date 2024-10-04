@@ -41,8 +41,21 @@ func main() {
 
 	// Serve front page
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		articles := listArticles(1, 10)
-		page := 1
+		pageStr := r.URL.Query().Get("page")
+
+		var page int
+		if pageStr == "" {
+			page = 1
+		} else {
+			var err error
+			page, err = strconv.Atoi(pageStr)
+
+			if err != nil {
+				page = 1
+			}
+		}
+
+		articles := listArticles(1, 10*page)
 
 		pageData := PageData{
 			NextPage: page + 1,

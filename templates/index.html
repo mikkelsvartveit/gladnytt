@@ -51,6 +51,7 @@
             hx-get="/articles/{{ .NextPage }}"
             hx-trigger="revealed"
             hx-swap="outerHTML"
+            hx-replace-url="/?page={{ .NextPage }}"
             src="/loading.svg"
             alt="Loading..."
             class="mx-auto mt-8 h-10"
