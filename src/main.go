@@ -15,6 +15,7 @@ import (
 type PageData struct {
 	NextPage int
 	Articles []Article
+	CssHash  string // Used for caching purposes
 }
 
 func main() {
@@ -39,6 +40,9 @@ func main() {
 	// Load HTML template
 	indexTmpl := template.Must(template.ParseFiles("templates/index.html"))
 
+	// Get MD5 hash for CSS output (used for cache versioning)
+	cssHash := getFileHash("static/output.css")
+
 	// Serve front page
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		pageStr := r.URL.Query().Get("page")
@@ -60,6 +64,7 @@ func main() {
 		pageData := PageData{
 			NextPage: page + 1,
 			Articles: articles,
+			CssHash:  cssHash,
 		}
 
 		err := indexTmpl.Execute(w, pageData)
@@ -87,6 +92,7 @@ func main() {
 		pageData := PageData{
 			NextPage: page + 1,
 			Articles: articles,
+			CssHash:  cssHash,
 		}
 
 		err = indexTmpl.ExecuteTemplate(w, "articles", pageData)
