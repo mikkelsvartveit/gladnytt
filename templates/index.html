@@ -8,7 +8,7 @@
   </head>
 
   <body>
-    <main class="mx-auto max-w-2xl px-4 pb-24 pt-8">
+    <main class="mx-auto max-w-3xl px-4 pb-24 pt-8">
       <h1 class="text-3xl">
         Gladnytt – den <i class="italic">trivelige</i> nyhetssiden
       </h1>
@@ -21,10 +21,10 @@
 
               <a
                 href="{{ .ArticleUrl }}"
-                class="flex flex-col gap-4 sm:flex-row"
+                class="flex flex-col gap-5 sm:flex-row"
               >
                 <img
-                  class="aspect-video rounded sm:h-36"
+                  class="aspect-video rounded sm:h-40"
                   src="{{ .ImageUrl }}"
                   alt="{{ .Title }}"
                 />
@@ -33,11 +33,11 @@
                   <p class="text-xs font-medium text-gray-600">
                     {{ .Time.Format "Monday, 15:04" }}
                   </p>
-                  <h3 class="mb-2 mt-1 text-xl">
+                  <h3 class="mb-2 mt-1 text-xl font-medium">
                     {{ .Title }}
                   </h3>
 
-                  <p class="line-clamp-3 text-sm">
+                  <p class="line-clamp-3">
                     {{ .Description }}
                   </p>
                 </div>
