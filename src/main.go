@@ -109,16 +109,3 @@ func main() {
 		fmt.Printf("Error starting server: %s\n", httpErr)
 	}
 }
-
-func runPeriodically(interval time.Duration, f func()) {
-	// Run the function immediately on startup
-	f()
-
-	// Run the function on the specified interval
-	ticker := time.NewTicker(interval)
-	defer ticker.Stop()
-
-	for range ticker.C {
-		f()
-	}
-}

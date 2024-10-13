@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 	"io"
 	"os"
+	"time"
 )
 
 func getFileHash(filePath string) string {
@@ -19,4 +20,17 @@ func getFileHash(filePath string) string {
 		return ""
 	}
 	return hex.EncodeToString(hash.Sum(nil))
+}
+
+func runPeriodically(interval time.Duration, f func()) {
+	// Run the function immediately on startup
+	f()
+
+	// Run the function on the specified interval
+	ticker := time.NewTicker(interval)
+	defer ticker.Stop()
+
+	for range ticker.C {
+		f()
+	}
 }
