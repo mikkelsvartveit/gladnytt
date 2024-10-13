@@ -103,7 +103,7 @@ func listArticles(page int, limit int) []Article {
 	err := db.Select(&articleRows, `
 		SELECT id, title, description, articleUrl, imageUrl, timestamp, sentiment
 		FROM articles
-		WHERE sentiment != 'negative'
+		WHERE sentiment != 'negative' AND sentiment != 'negativ'
 		ORDER BY timestamp DESC
 		LIMIT ? OFFSET ?
 	`, limit, (page-1)*limit)
@@ -120,12 +120,19 @@ func listArticles(page int, limit int) []Article {
 
 	var articles []Article
 	for _, row := range articleRows {
+		imageUrl := row.ImageUrl
+		if imageUrl == "" {
+			imageUrl = "/image-placeholder.svg"
+		}
+
+		timestamp := time.Unix(row.Timestamp, 0).In(norwayTimezone)
+
 		article := Article{
 			Title:       row.Title,
 			Description: row.Description,
 			ArticleUrl:  row.ArticleUrl,
-			ImageUrl:    row.ImageUrl,
-			Time:        time.Unix(row.Timestamp, 0).In(norwayTimezone),
+			ImageUrl:    imageUrl,
+			Time:        timestamp,
 			Sentiment:   row.Sentiment,
 		}
 

@@ -60,6 +60,8 @@ func fetchData() {
 		return
 	}
 
+	rss.Channel.Items = rss.Channel.Items[:10]
+
 	for _, item := range rss.Channel.Items {
 		processArticle(item)
 	}
@@ -71,8 +73,10 @@ func processArticle(rssItem Item) {
 		return
 	}
 
+	fmt.Printf("Processing article '%s'\n", rssItem.Title)
+
 	// Convert pubDate to Unix timestamp
-	time, err := time.Parse(time.RFC1123, rssItem.PubDate)
+	timestamp, err := time.Parse(time.RFC1123, rssItem.PubDate)
 	if err != nil {
 		fmt.Println("Error parsing pubDate:", err)
 		return
@@ -81,7 +85,7 @@ func processArticle(rssItem Item) {
 	article := Article{
 		Title:       rssItem.Title,
 		Description: rssItem.Description,
-		Time:        time,
+		Time:        timestamp,
 		ArticleUrl:  rssItem.Link,
 		ImageUrl:    rssItem.MediaContent.URL,
 	}
