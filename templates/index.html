@@ -8,10 +8,19 @@
   </head>
 
   <body>
-    <main class="mx-auto max-w-3xl px-4 pb-24 pt-8">
+    <main class="mx-auto max-w-3xl px-4 pb-24 pt-8 text-gray-800">
       <h1 class="text-3xl">
         Gladnytt – den <i class="italic">trivelige</i> nyhetssiden
       </h1>
+
+      <p class="mt-2 text-sm text-gray-500">
+        Nyheter levert av
+        <a
+          class="underline underline-offset-2"
+          href="https://www.nrk.no/toppsaker.rss"
+          >NRK</a
+        >.
+      </p>
 
       <div>
         {{ block "articles" . }}
