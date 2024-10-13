@@ -1,6 +1,8 @@
-# Gladnytt
+# Gladnytt.net
 
-Gladnytt is a news website that uses sentiment analysis to filter out negative news articles. The articles are fetched from NRK's RSS feed every minute, and sentiment is determined by GPT-4o. The app is built with Go and htmx.
+Gladnytt.net is a news website that uses sentiment analysis to filter out negative news articles. The articles are fetched from NRK's RSS feed every minute, and sentiment is determined by GPT-4o. The app is built with Go and htmx.
+
+![Screenshot](https://github.com/user-attachments/assets/5d443004-4aa1-4c63-b5ae-3f4c62586f90)
 
 ## Running locally
 
