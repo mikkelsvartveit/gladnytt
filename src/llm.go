@@ -15,7 +15,7 @@ func callLLM(system_prompt, user_prompt string) string {
 	response, err := client.CreateChatCompletion(
 		context.Background(),
 		openai.ChatCompletionRequest{
-			Model:       openai.GPT4o,
+			Model:       openai.GPT4oMini,
 			Temperature: 0.3,
 			Messages: []openai.ChatCompletionMessage{
 				{
